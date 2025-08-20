@@ -28,7 +28,13 @@ const DataCards = () => {
       const Id = await AsyncStorage.getItem("id");
       const token = await AsyncStorage.getItem("accessToken");
 
-      const response = await axios.get(
+      if (!token || !Id) {
+        console.error("Token or Id missing in AsyncStorage");
+        setLoading(false);
+        return;
+      }
+
+      const response = await axios.post(
         "https://qa.healthshade.com/api/purchase_order",
         { id: Id },
         {
@@ -38,7 +44,9 @@ const DataCards = () => {
           },
         }
       );
-      setSelectedData(response.data);
+      console.log("Purchase_Order Api is being hit");
+      console.log("Selected Data:", response.data.purchase_order);
+      setSelectedData(response.data.purchase_order);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -77,7 +85,7 @@ const DataCards = () => {
         setLoading(false);
       }
     };
-    console.log("Api is being hit");
+    console.log("Purchase_List Api is being hit");
 
     fetchData();
   }, []);
@@ -121,16 +129,24 @@ const DataCards = () => {
             {loading ? (
               <ActivityIndicator size="large" color="#000" />
             ) : selectedData ? (
-              <>
-                <Text style={styles.modalTitle}>{selectedData.title}</Text>
-                <Text>{selectedData.description}</Text>
+              <View style={styles.card}>
+                {" "}
+                {/* Same design as FlatList card */}
+                <Text style={styles.title}>
+                  {selectedData?.product?.product_name || "No Product"}
+                </Text>
+                <Text>
+                  {selectedData?.purchased_products?.product_supplier_id ||
+                    "No Supplier"}
+                </Text>
+                <Text>{selectedData?.status || "No Status"}</Text>
                 <TouchableOpacity
                   style={styles.closeButton}
                   onPress={() => setModalVisible(false)}
                 >
                   <Text style={{ color: "#fff" }}>Close</Text>
                 </TouchableOpacity>
-              </>
+              </View>
             ) : (
               <Text>No data found</Text>
             )}

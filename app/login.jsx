@@ -35,6 +35,8 @@ const LoginScreen = () => {
 
       const { access_token, token_type, user } = response.data;
       const { location_id } = user;
+      const { id } = user;
+      await AsyncStorage.setItem("id", JSON.stringify(id));
       await AsyncStorage.setItem("accessToken", access_token);
       await AsyncStorage.setItem("tokenType", token_type);
       await AsyncStorage.setItem("location_id", location_id);
