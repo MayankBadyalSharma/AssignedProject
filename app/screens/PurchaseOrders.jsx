@@ -10,13 +10,14 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import Badge from "../../components/PO_Badge";
 
 const DataCards = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   // for Opening Of MOdal [new addition]
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedData, setSelectedData] = useState(null);
+  const [selectedData, setSelectedData] = useState([]);
   // const [loading, setLoading] = useState(false);
 
   // for Opening Of MOdal [new addition]
@@ -44,9 +45,14 @@ const DataCards = () => {
           },
         }
       );
-      console.log("Purchase_Order Api is being hit");
-      console.log("Selected Data:", response.data.purchase_order);
-      setSelectedData(response.data.purchase_order);
+
+      const purchaseproduct =
+        response.data.purchase_order.purchased_products.product;
+
+      // console.log("Purchase_Order Api is being hit");
+      // console.log("Selected Data:", purchaseproduct);
+      setSelectedData(purchaseproduct);
+      console.log(selectedData);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -77,7 +83,7 @@ const DataCards = () => {
             },
           }
         );
-        console.log(response.data);
+        // console.log(response.data);
         setData(response.data.data || []);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -85,7 +91,7 @@ const DataCards = () => {
         setLoading(false);
       }
     };
-    console.log("Purchase_List Api is being hit");
+    // console.log("Purchase_List Api is being hit");
 
     fetchData();
   }, []);
@@ -111,7 +117,10 @@ const DataCards = () => {
                 {item.purchase_oder_number || "No Title"}
               </Text>
               <Text>{item.id || "No Description"}</Text>
-              <Text>{item.status || "No Status"}</Text>
+
+              {/* <Badge styling is in components - PO_Badge.jsx file > */}
+
+              <Badge status={item.status} />
             </View>
           </TouchableOpacity>
         )}
@@ -133,12 +142,9 @@ const DataCards = () => {
                 {" "}
                 {/* Same design as FlatList card */}
                 <Text style={styles.title}>
-                  {selectedData?.product?.product_name || "No Product"}
+                  {selectedData.product_name || "No Product"}
                 </Text>
-                <Text>
-                  {selectedData?.purchased_products?.product_supplier_id ||
-                    "No Supplier"}
-                </Text>
+                <Text>{selectedData.product_supplier_id || "No Supplier"}</Text>
                 <Text>{selectedData?.status || "No Status"}</Text>
                 <TouchableOpacity
                   style={styles.closeButton}
